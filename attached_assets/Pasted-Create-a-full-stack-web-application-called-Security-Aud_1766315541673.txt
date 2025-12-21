@@ -1,0 +1,93 @@
+Create a full-stack web application called "Security Audit Platform" using Python (Flask) for the backend and HTML, CSS, and JavaScript for the frontend.
+
+Purpose:
+This application allows users to perform security audits such as:
+1) Cryptographic Misconfiguration Scanning
+2) TLS & Transport Layer Security Auditing
+The app should focus on user interaction, clean UI, and clear result presentation. Scanner logic can be placeholder functions for now.
+
+Pages Required:
+
+1. Landing Page (/)
+- Title: "Security Audit Platform"
+- Subtitle explaining cryptographic and TLS security analysis
+- Feature cards:
+  - Cryptographic Misconfiguration Scanner
+  - TLS & Transport Layer Security Auditor
+- "Start Scan" button redirecting to Dashboard
+
+2. Dashboard (/dashboard)
+- Sidebar navigation:
+  - Dashboard
+  - Crypto Scanner
+  - TLS Auditor
+  - Scan Results
+  - Reports
+  - About
+- Main area with cards to launch:
+  - Crypto Scanner
+  - TLS Auditor
+
+3. Cryptographic Misconfiguration Scanner (/crypto-scan)
+- Dropdown to select language (Python, Java, JavaScript)
+- Large textarea for pasting source code
+- File upload option
+- "Scan for Crypto Issues" button
+- On submit, send data to backend and redirect to Results page
+
+4. TLS & Transport Layer Security Auditor (/tls-scan)
+- Input field for domain or IP address
+- Checkboxes for:
+  - Missing TLS
+  - Weak TLS versions
+  - Weak cipher suites
+  - Invalid certificate chain
+  - Missing HSTS
+- "Start TLS Audit" button
+- Backend returns simulated findings
+
+5. Scan Results Page (/results)
+- Display:
+  - Overall Risk Score (Low / Medium / High)
+  - Table of vulnerabilities with:
+    Vulnerability Name
+    Severity
+    OWASP Mapping
+    CWE ID
+    Description
+  - Attack simulation explanation
+  - Fix recommendations
+
+6. Reports Page (/reports)
+- List of previous scans (dummy data)
+- Buttons to download reports (HTML or PDF placeholders)
+
+7. About Page (/about)
+- Explanation of:
+  - What the platform does
+  - OWASP Top 10 relevance
+  - Educational disclaimer
+
+Backend Requirements:
+- Use Flask routing
+- Create placeholder scan functions:
+  - crypto_scan()
+  - tls_scan()
+- Return mock JSON results mapped to OWASP categories
+- Maintain simple in-memory scan history
+
+Frontend Requirements:
+- Use a dark cybersecurity-themed UI
+- Responsive layout
+- Severity badges (Low/Medium/High)
+- Clean tables and cards
+- Minimal JavaScript for form handling and navigation
+
+Project Structure:
+- app.py
+- templates/
+- static/css/
+- static/js/
+
+Do NOT implement real scanning logic yet.
+Focus on clean UI, routing, and result visualization.
