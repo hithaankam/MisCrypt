@@ -56,7 +56,7 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Launch */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-3">
         <Card className="group border-white/10 bg-card hover:border-primary/50 transition-all duration-300">
           <CardHeader>
             <div className="mb-4 h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
@@ -90,6 +90,25 @@ export default function Dashboard() {
             <Link href="/tls-scan">
               <Button variant="outline" className="w-full font-mono-tech border-white/10 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-colors">
                 Start Audit <ArrowUpRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="group border-white/10 bg-card hover:border-orange-500/50 transition-all duration-300">
+          <CardHeader>
+            <div className="mb-4 h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500 border border-orange-500/20">
+              <Activity className="h-5 w-5" />
+            </div>
+            <CardTitle className="font-mono-tech text-xl">Runtime Analyzer</CardTitle>
+            <CardDescription>
+              Detect exploitation attempts and attack patterns in server logs for real-time threat assessment.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/runtime-scan">
+              <Button variant="outline" className="w-full font-mono-tech border-white/10 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors">
+                Analyze Logs <ArrowUpRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </CardContent>

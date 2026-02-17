@@ -9,6 +9,7 @@ import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import CryptoScanner from "@/pages/crypto-scanner";
 import TLSScanner from "@/pages/tls-auditor";
+import RuntimeAnalyzer from "@/pages/runtime-analyzer";
 import Results from "@/pages/results";
 import Reports from "@/pages/reports";
 import About from "@/pages/about";
@@ -22,6 +23,7 @@ function Router() {
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/crypto-scan" component={CryptoScanner} />
         <Route path="/tls-scan" component={TLSScanner} />
+        <Route path="/runtime-scan" component={RuntimeAnalyzer} />
         <Route path="/results" component={Results} />
         <Route path="/reports" component={Reports} />
         <Route path="/about" component={About} />

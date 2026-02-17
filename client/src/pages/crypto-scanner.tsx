@@ -1,29 +1,92 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
-import { Terminal, Upload, Play, Loader2 } from "lucide-react";
+import { Terminal, Upload, Play, Loader2, GitBranch } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
 
 export default function CryptoScanner() {
   const [loading, setLoading] = useState(false);
+  const [code, setCode] = useState("");
+  const [repoUrl, setRepoUrl] = useState("");
+  const [language, setLanguage] = useState("python");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const handleScan = () => {
+  const handleCodeScan = async () => {
+    if (!code.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter some code to scan",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
-    // Simulate scan delay
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const result = await api.staticScan({ code, language });
+      
+      sessionStorage.setItem('scanResults', JSON.stringify({
+        type: 'static',
+        data: result
+      }));
+      
       toast({
         title: "Scan Complete",
-        description: "Redirecting to analysis results...",
+        description: `Found ${result.total_issues} potential issues`,
       });
       setLocation("/results");
-    }, 2000);
+    } catch (error) {
+      toast({
+        title: "Scan Failed",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRepoScan = async () => {
+    if (!repoUrl.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a Git repository URL",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await api.staticScan({ repo_url: repoUrl });
+      
+      sessionStorage.setItem('scanResults', JSON.stringify({
+        type: 'static',
+        data: result
+      }));
+      
+      toast({
+        title: "Scan Complete",
+        description: `Found ${result.total_issues} potential issues in repository`,
+      });
+      setLocation("/results");
+    } catch (error) {
+      toast({
+        title: "Scan Failed",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,48 +104,95 @@ export default function CryptoScanner() {
       <Card className="border-white/10 bg-card">
         <CardHeader>
           <CardTitle>Source Code Analysis</CardTitle>
-          <CardDescription>Paste your source code or upload a file to begin the audit.</CardDescription>
+          <CardDescription>Scan code directly or analyze a Git repository.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label>Target Language</Label>
-            <Select defaultValue="python">
-              <SelectTrigger className="w-full bg-background/50 border-white/10">
-                <SelectValue placeholder="Select Language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="python">Python</SelectItem>
-                <SelectItem value="java">Java</SelectItem>
-                <SelectItem value="javascript">JavaScript / TypeScript</SelectItem>
-                <SelectItem value="go">Go</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <CardContent>
+          <Tabs defaultValue="code" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="code">
+                <Terminal className="mr-2 h-4 w-4" />
+                Code Input
+              </TabsTrigger>
+              <TabsTrigger value="repo">
+                <GitBranch className="mr-2 h-4 w-4" />
+                Git Repository
+              </TabsTrigger>
+            </TabsList>
 
-          <div className="space-y-2">
-            <Label>Source Code</Label>
-            <Textarea 
-              placeholder="Paste code here..." 
-              className="min-h-[300px] font-mono text-sm bg-black/40 border-white/10 resize-none focus-visible:ring-primary" 
-            />
-          </div>
+            <TabsContent value="code" className="space-y-6">
+              <div className="space-y-2">
+                <Label>Target Language</Label>
+                <Select value={language} onValueChange={setLanguage}>
+                  <SelectTrigger className="w-full bg-background/50 border-white/10">
+                    <SelectValue placeholder="Select Language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="python">Python</SelectItem>
+                    <SelectItem value="java">Java</SelectItem>
+                    <SelectItem value="javascript">JavaScript / TypeScript</SelectItem>
+                    <SelectItem value="go">Go</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="border-dashed border-white/20 hover:border-primary/50 hover:text-primary">
-              <Upload className="mr-2 h-4 w-4" /> Upload File
-            </Button>
-            <Button onClick={handleScan} disabled={loading} className="bg-primary text-primary-foreground hover:bg-primary/90">
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Scanning...
-                </>
-              ) : (
-                <>
-                  <Play className="mr-2 h-4 w-4" /> Start Analysis
-                </>
-              )}
-            </Button>
-          </div>
+              <div className="space-y-2">
+                <Label>Source Code</Label>
+                <Textarea 
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="Paste code here..." 
+                  className="min-h-[300px] font-mono text-sm bg-black/40 border-white/10 resize-none focus-visible:ring-primary" 
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Button variant="outline" className="border-dashed border-white/20 hover:border-primary/50 hover:text-primary">
+                  <Upload className="mr-2 h-4 w-4" /> Upload File
+                </Button>
+                <Button onClick={handleCodeScan} disabled={loading} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Scanning...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="mr-2 h-4 w-4" /> Start Analysis
+                    </>
+                  )}
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="repo" className="space-y-6">
+              <div className="space-y-2">
+                <Label>Git Repository URL</Label>
+                <div className="relative">
+                  <GitBranch className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    value={repoUrl}
+                    onChange={(e) => setRepoUrl(e.target.value)}
+                    placeholder="https://github.com/username/repository" 
+                    className="pl-9 bg-background/50 border-white/10 font-mono" 
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  The scanner will clone and analyze all Python, Java, JavaScript, TypeScript, and Go files.
+                </p>
+              </div>
+
+              <Button onClick={handleRepoScan} disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Scanning Repository...
+                  </>
+                ) : (
+                  <>
+                    <Play className="mr-2 h-4 w-4" /> Scan Repository
+                  </>
+                )}
+              </Button>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
 
@@ -95,7 +205,7 @@ export default function CryptoScanner() {
             <div>
               <h4 className="font-medium font-mono-tech text-sm text-primary mb-1">Supported Checks</h4>
               <p className="text-xs text-muted-foreground">
-                MD5/SHA1 hashing, ECB mode usage, hardcoded keys, weak random number generation, insecure padding, known CVEs.
+                MD5/SHA1 hashing, ECB mode usage, hardcoded keys, weak RSA keys, insecure random number generation.
               </p>
             </div>
           </div>
