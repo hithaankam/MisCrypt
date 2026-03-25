@@ -96,16 +96,21 @@ export const api = {
   async runtimeScan(request: RuntimeScanRequest): Promise<RuntimeScanResponse> {
     const response = await fetch(`${BACKEND_URL}/api/runtime/scan`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request),
     });
-    
-    if (!response.ok) {
-      throw new Error(`Runtime scan failed: ${response.statusText}`);
-    }
-    
+    if (!response.ok) throw new Error(`Runtime scan failed: ${response.statusText}`);
+    return response.json();
+  },
+
+  async runtimeScanUpload(file: File): Promise<RuntimeScanResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch(`${BACKEND_URL}/api/runtime/scan/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) throw new Error(`Runtime scan failed: ${response.statusText}`);
     return response.json();
   },
 
